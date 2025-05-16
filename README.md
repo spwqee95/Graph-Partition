@@ -1,5 +1,3 @@
----
-
 # Random Graph Generator with Resource Constraints
 
 This tool generates **connected undirected graphs** with weighted vertices and edges, and supports **multiple resource constraints per partition**. It outputs two text files: one describing the graph and another describing partition limits. Optionally, it will also **visualize the graph** (if it's small enough).
