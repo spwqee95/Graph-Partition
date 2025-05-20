@@ -1,5 +1,3 @@
----
-
 # Random Graph Generator with Resource Constraints
 
 `gen_graph.py` generates **connected undirected graphs** with weighted vertices and edges, where **vertex weight is treated as resource\[0]**, and supports **multiple resource constraints across partitions**. Capacities are automatically derived from vertex usage and user-defined **resource utilization rates**.
