@@ -1,91 +1,110 @@
+---
+
 # Random Graph Generator with Resource Constraints
 
-gen_graph.py generates **connected undirected graphs** with weighted vertices and edges, and supports **multiple resource constraints per partition**. It outputs two text files: one describing the graph and another describing partition limits. Optionally, it will also **visualize the graph** (if it's small enough).
+`gen_graph.py` generates **connected undirected graphs** with weighted vertices and edges, where **vertex weight is treated as resource\[0]**, and supports **multiple resource constraints across partitions**. Capacities are automatically derived from vertex usage and user-defined **resource utilization rates**.
 
 ---
 
 ## Features
 
-* Random graph generation (ensures connectivity)
-* Configurable:
+* Random connected graph generation
+* Automatic resource capacity calculation per partition
+* Flexible CLI inputs with sensible defaults:
 
   * Number of vertices
-  * Edge weight and vertex resource ranges
-  * Resource types and partition capacities
-* **Vertex weight is treated as resource\[0]**
-* Validation of total resource usage vs partition capacity
-* Saves:
-
-  * `graph.txt`: vertex + edge info
-  * `graph_part.txt`: partition resource limits
-  * `graph.png`: optional visualization if `< 20` vertices
+  * Number of partitions
+  * Number of resources (in addition to weight)
+  * Resource utilization rate (per resource)
+  * Resource allocation ratios among partitions
+  * Weight and edge range customization
+* Graph output (`.txt`), partition capacities (`_part.txt`)
+* Optional visualization if vertex count < 20 (`.png`)
+* Prints full graph summary after generation
 
 ---
 
-## Usage
+## Usage Example
 
 ```bash
 python gen_graph2.py \
-  --num_vertices 6 \
-  --max_edges_per_vertex 5 \
-  --vertex_weight_range 1 10 \
-  --edge_weight_range 1 5 \
-  --num_resources 1 \
-  --resource_weight_range 1 5 \
-  --k_partitions 2 \
-  --partition_max_resources 15 20  10 15 \
+  --num_vertices 10 \
+  --num_resources 2 \
+  --k_partitions 3 \
+  --partition_max_resources_ratio 0.3 0.4 0.3 \
+  --resource_util_rate 0.9 0.2 0.5 \
   --output demo_graph.txt
 ```
 
-### Explanation:
+---
 
-| Argument                    | Description                                                  |
-| --------------------------- | ------------------------------------------------------------ |
-| `--num_vertices`            | Total number of nodes                                        |
-| `--max_edges_per_vertex`    | Max random degree                                            |
-| `--vertex_weight_range`     | Vertex weight range (used as resource\[0])                   |
-| `--edge_weight_range`       | Edge weight range                                            |
-| `--num_resources`           | Number of *additional* resources per vertex                  |
-| `--resource_weight_range`   | Value range for each resource                                |
-| `--k_partitions`            | Number of partitions                                         |
-| `--partition_max_resources` | Flattened list of resource capacities per partition          |
-| `--output`                  | Filename for output (creates `X.txt`, `X_part.txt`, `X.png`) |
+## ⚙️ CLI Arguments
+
+| Argument                          | Description                                                               |
+| --------------------------------- | ------------------------------------------------------------------------- |
+| `--num_vertices`                  | Number of vertices                                                        |
+| `--num_resources`                 | Number of *additional* resources (not including weight)                   |
+| `--k_partitions`                  | Number of partitions                                                      |
+| `--partition_max_resources_ratio` | List of k floats that sum to 1.0; determines each partition’s share       |
+| `--resource_util_rate`            | Utilization rate **per resource** (including weight as resource\[0])      |
+| `--vertex_weight_range`           | Min and max weight of vertex (default: 1 10)                              |
+| `--edge_weight_range`             | Min and max edge weight (default: 1 5)                                    |
+| `--resource_weight_range`         | Min and max value for each additional resource (default: 1 10)            |
+| `--output`                        | Base filename (e.g. `graph.txt`, generates `graph_part.txt`, `graph.png`) |
 
 ---
 
 ## Output Format
 
-### `demo_graph.txt`
+### `graph.txt`
 
 ```
 <num_vertices> <num_edges>
-<resource[0]=weight> <resource[1]> ... <neighbor_index> <edge_weight> ...
+<weight> <resource1> <resource2> ... <neighbor> <edge_weight> ...
 ```
 
-### `demo_graph_part.txt`
+### `graph_part.txt`
 
 ```
 <k_partitions>
-<num_resources_including_weight>
-<resource_0 capacity for partition 1> <partition 2> ...
+<num_resources (including weight)>
+<resource_0 partition_1 capacity> ... <partition_k>
+<resource_1 partition_1 capacity> ... <partition_k>
 ...
 ```
 
 ---
 
-## Example Visualization
+## Visualization
 
-If your graph has < 20 vertices, it will save a plot as:
+If `num_vertices < 20`, the graph will be visualized as:
 
 ```
-demo_graph.png
+graph.png
 ```
+
+Each node is labeled with its index; edge weights are displayed.
+
+---
+
+## Printed Graph Summary
+
+After generation, you will see:
+
+* Total vertices and edges
+* Average vertex degree
+* For each resource:
+
+  * Total used
+  * Partition capacity
+  * Target utilization
+  * Actual utilization
 
 ---
 
 ## Dependencies
 
-Make sure to install:
+Install with:
 
 ```bash
 pip install networkx matplotlib
