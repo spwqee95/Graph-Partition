@@ -16,7 +16,7 @@
   * Resource utilization rate (per resource)
   * Resource allocation ratios among partitions
   * Weight and edge range customization
-* Graph output (`.txt`), partition parameters (k partition, m resources, and resource capacities) (`_part.txt`)
+* Graph output (`.txt`), partition parameters (k partitions, m resources, and resource capacities) (`_part.txt`)
 * Optional visualization if vertex count < 20 (`.png`)
 * Prints full graph summary after generation
 
