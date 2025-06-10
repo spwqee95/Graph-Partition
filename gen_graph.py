@@ -58,6 +58,22 @@ def compute_partition_caps_v2(vertex_resources, num_resources, k_partitions,
         partition_caps.append(caps)
     return partition_caps
 
+def generate_fixed_vertex_assignments(num_vertices, k, ratio):
+    num_fixed = int(num_vertices * ratio)
+    fixed_indices = random.sample(range(num_vertices), num_fixed)
+    fixed_assignments = {idx: random.randint(0, k - 1) for idx in fixed_indices}
+    return fixed_assignments
+
+def save_partition_file(filename, k, partition_caps, fixed_assignments=None):
+    with open(filename, "w") as f:
+        f.write(f"{k}\n")
+        f.write(f"{len(partition_caps)}\n")
+        for r in partition_caps:
+            f.write(" ".join(map(str, r)) + "\n")
+        if fixed_assignments:
+            for idx in sorted(fixed_assignments):
+                f.write(f"{idx} {fixed_assignments[idx]}\n")
+
 def save_graph_file(filename, vertex_resources, adjacency, num_edges):
     with open(filename, "w") as f:
         f.write(f"{len(vertex_resources)} {num_edges}\n")
@@ -66,13 +82,6 @@ def save_graph_file(filename, vertex_resources, adjacency, num_edges):
             for v, w in adjacency[u]:
                 line += [str(v + 1), str(w)]
             f.write(" ".join(line) + "\n")
-
-def save_partition_file(filename, k, partition_caps):
-    with open(filename, "w") as f:
-        f.write(f"{k}\n")
-        f.write(f"{len(partition_caps)}\n")
-        for r in partition_caps:
-            f.write(" ".join(map(str, r)) + "\n")
 
 def visualize_graph(vertex_resources, adjacency, output_path):
     if len(vertex_resources) >= 20:
@@ -115,7 +124,7 @@ def print_graph_summary(vertex_resources, adjacency, partition_caps, resource_ut
     for i in range(num_resources):
         total_cap = sum(partition_caps[i])
         utilization = total_usage[i] / total_cap if total_cap > 0 else 0
-        print(f"  o Resource {i}:")
+        print(f"  Resource {i}:")
         print(f"    - Total used: {total_usage[i]}")
         print(f"    - Total capacity: {total_cap}")
         print(f"    - Target utilization rate: {resource_util_rates[i]}")
@@ -135,6 +144,8 @@ def main():
                         help="Min and max edge weight (default: 1 5)")
     parser.add_argument("--resource_weight_range", type=int, nargs=2, default=[1, 10],
                         help="Min and max resource weight (default: 1 10)")
+    parser.add_argument("--fixed_vertex_ratio", type=float, default=0.0,
+                        help="Ratio of vertices fixed to specific partitions (default: 0.0)")
     parser.add_argument("--output", type=str, default="graph.txt")
     args = parser.parse_args()
 
@@ -154,8 +165,10 @@ def main():
         resource_util_rates=args.resource_util_rate
     )
 
+    fixed_assignments = generate_fixed_vertex_assignments(args.num_vertices, args.k_partitions, args.fixed_vertex_ratio)
+
     save_graph_file(args.output, vertex_resources, adjacency, num_edges)
-    save_partition_file(args.output.replace(".txt", "_part.txt"), args.k_partitions, partition_caps)
+    save_partition_file(args.output.replace(".txt", "_part.txt"), args.k_partitions, partition_caps, fixed_assignments)
 
     if args.num_vertices < 20:
         visualize_graph(vertex_resources, adjacency, output_path=args.output.replace(".txt", ".png"))
