@@ -1,6 +1,6 @@
 # Random Graph Generator with Resource Constraints
 
-`gen_graph.py` generates **connected undirected graphs** with weighted vertices and edges, where **vertex weight is treated as resource\[0]**, and supports **multiple resource constraints across partitions**. Capacities are automatically derived from vertex usage and user-defined **resource utilization rates**.
+`gen_graph.py` generates **connected undirected graphs** with weighted vertices and edges, where **vertex weight is treated as resource\[0]**, and supports **multiple resource constraints across partitions**. Capacities are automatically derived from vertex usage and user-defined **resource utilization rates**. You can also fix a subset of vertices to specific partitions.
 
 ---
 
@@ -16,6 +16,7 @@
   * Resource utilization rate (per resource)
   * Resource allocation ratios among partitions
   * Weight and edge range customization
+  * Fixed vertex partition assignment
 * Graph output (`.txt`), partition parameters (k partitions, m resources, and resource capacities) (`_part.txt`)
 * Optional visualization if vertex count < 20 (`.png`)
 * Prints full graph summary after generation
@@ -31,6 +32,7 @@ python gen_graph2.py \
   --k_partitions 3 \
   --partition_max_resources_ratio 0.3 0.4 0.3 \
   --resource_util_rate 0.9 0.2 0.5 \
+  --fixed_vertex_ratio 0.2 \
   --output demo_graph.txt
 ```
 
@@ -48,6 +50,7 @@ python gen_graph2.py \
 | `--vertex_weight_range`           | Min and max weight of vertex (default: 1 10)                              |
 | `--edge_weight_range`             | Min and max edge weight (default: 1 5)                                    |
 | `--resource_weight_range`         | Min and max value for each additional resource (default: 1 10)            |
+| `--fixed_vertex_ratio`            | Fraction of vertices fixed to a partition (e.g., 0.2 = 20%)               |
 | `--output`                        | Base filename (e.g. `graph.txt`, generates `graph_part.txt`, `graph.png`) |
 
 ---
@@ -69,9 +72,13 @@ python gen_graph2.py \
 <resource_0 partition_1 capacity> ... <partition_k>
 <resource_1 partition_1 capacity> ... <partition_k>
 ...
+<fixed_vertex_index> <assigned_partition>
+<fixed_vertex_index> <assigned_partition>
+...
 ```
 
 ---
+Note: If --fixed_vertex_ratio > 0, a list of fixed vertex assignments will be appended, sorted by vertex index.
 
 ## Visualization
 
