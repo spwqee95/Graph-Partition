@@ -124,7 +124,7 @@ def print_graph_summary(vertex_resources, adjacency, partition_caps, resource_ut
     for i in range(num_resources):
         total_cap = sum(partition_caps[i])
         utilization = total_usage[i] / total_cap if total_cap > 0 else 0
-        print(f"  Resource {i}:")
+        print(f"  o Resource {i}:")
         print(f"    - Total used: {total_usage[i]}")
         print(f"    - Total capacity: {total_cap}")
         print(f"    - Target utilization rate: {resource_util_rates[i]}")
